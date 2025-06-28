@@ -1,0 +1,12 @@
+Developers or any person who spends long hours in front of a screen may face eye problems due to continuous screen exposure. To mitigate this, we want to build a Chrome extension that reminds users to take eye breaks by blinking the screen at regular intervals.
+
+
+Let me know if you’d like to integrate:
+
+User settings (sound on/off, theme) with this
+
+Toast/alert/modal logic as separate types
+
+Eye exercise messages instead of black screen
+
+I can help you modularize it next.
