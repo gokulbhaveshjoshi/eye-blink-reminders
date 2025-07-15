@@ -1,43 +1,75 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Eye Care Reminder</title>
-    <link rel="stylesheet" href="popup.css">
-    <style>
-      body { font-family: sans-serif; padding: 10px; }
-      input { width: 50px; }
-    </style>
-  </head>
-  <body>
-    <h2>Eye Care Reminder</h2>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Eye Care Reminder</title>
+  <link rel="stylesheet" href="popup.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+  />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1><i class="fa-solid fa-eye"></i> Eye Care Reminder</h1>
+      <p class="subtitle">Protect your eyes. Blink often!</p>
+    </header>
+
     <form id="reminderForm">
-      <label for="interval">Reminder every</label>
-      <input type="number" id="interval" min="1" value="20"> <span>minutes</span>
-      <br>
-      <label for="duration">Blink duration</label>
-      <input type="number" id="duration" min="1" value="3"> <span>seconds</span>
-      <br>
-      <label for="sound">Alert sound</label>
-      <select id="sound">
-        <option value="bell" selected>Bell (default)</option>
-        <option value="beep">Beep</option>
-        <option value="chime">Chime</option>
-      </select>
-      <br>
-      <label for="displayStyle">Display style</label>
-      <select id="displayStyle">
-        <option value="fullscreen" selected>Full Screen Blink</option>
-        <option value="toast">Side Toast Message</option>
-      </select>
-      <br>
-      <label>
-        <input type="checkbox" id="disableMusic">
-        Disable music
-      </label>
-      <br>
-      <button id="save" type="submit">Save</button>
+      <div class="form-group">
+        <label for="interval"><i class="fa-regular fa-clock"></i> Reminder Interval</label>
+        <div class="inline-input">
+          <input type="number" id="interval" min="1" max="180" value="20" />
+          <span class="unit">minutes</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="displayStyle"><i class="fa-solid fa-display"></i> Popup Style</label>
+        <select id="displayStyle">
+          <option value="toast" selected>Side Toast Message</option>
+          <option value="fullscreen">Full Screen Blink</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="duration"><i class="fa-regular fa-hourglass-half"></i> Popup Duration</label>
+        <div class="inline-input">
+          <input type="number" id="duration" min="1" value="3" />
+          <span class="unit">seconds</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sound"><i class="fa-solid fa-volume-high"></i> Alert Sound</label>
+        <div class="inline-select">
+          <select id="sound">
+            <option value="bell" selected>Bell</option>
+            <option value="beep">Beep</option>
+            <option value="music/eyeblinks.mp3">Blink Clicks</option>
+            <option value="music/cartoon_blinking.mp3">Cartoon Blink</option>
+            <option value="music/metallic_clank.mp3">Metallic Clank</option>
+            <option value="none">No Sound</option>
+          </select>
+          <button type="button" id="playSound" class="icon-btn" title="Preview Sound">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group checkbox">
+        <input type="checkbox" id="enableExtension" checked />
+        <label for="enableExtension">Enable Eye Reminder</label>
+      </div>
+
+      <button type="submit" id="save">💾 Save Settings</button>
     </form>
-    <p id="status"></p>
-    <script src="popup.js"></script>
-  </body>
-</html> 
+
+    <p id="status" class="status-msg"></p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -8,7 +8,6 @@ window.addEventListener('keydown', () => {
 });
 
 function playBell() {
-    // Bell-like sound
     playTone(880, 0.1, 'sine');
     setTimeout(() => playTone(660, 0.1, 'sine'), 120);
     setTimeout(() => playTone(440, 0.15, 'triangle'), 240);
@@ -19,9 +18,20 @@ function playBeep() {
 }
 
 function playChime() {
-    playTone(523.25, 0.12, 'triangle'); // C5
-    setTimeout(() => playTone(659.25, 0.12, 'triangle'), 130); // E5
-    setTimeout(() => playTone(783.99, 0.18, 'triangle'), 260); // G5
+    playTone(523.25, 0.12, 'triangle');
+    setTimeout(() => playTone(659.25, 0.12, 'triangle'), 130);
+    setTimeout(() => playTone(783.99, 0.18, 'triangle'), 260);
+}
+
+function playPop() {
+    playTone(700, 0.06, 'triangle');
+    setTimeout(() => playTone(500, 0.08, 'triangle'), 80);
+}
+
+function playSoftBlink() {
+    playTone(660, 0.05, 'sine');
+    setTimeout(() => playTone(440, 0.07, 'sine'), 60);
+    setTimeout(() => playTone(330, 0.05, 'sine'), 120);
 }
 
 function playTone(frequency, duration, type = 'sine') {
@@ -62,7 +72,7 @@ function showAudioWarning(overlay) {
     overlay.appendChild(warn);
 }
 
-function blinkScreen(duration = 1000, sound = 'bell', disableMusic = false, displayStyle = 'fullscreen') {
+function blinkScreen(duration = 100, sound = 'bell', displayStyle = 'fullscreen') {
     if (document.getElementById("eye-reminder-overlay") || document.getElementById("eye-reminder-toast")) return;
 
     if (displayStyle === 'toast') {
@@ -70,6 +80,21 @@ function blinkScreen(duration = 1000, sound = 'bell', disableMusic = false, disp
         const toast = document.createElement("div");
         toast.id = "eye-reminder-toast";
         toast.textContent = "Time for an eye break! Blink your eyes.";
+
+        // Close icon
+        const closeBtn = document.createElement("span");
+        closeBtn.textContent = "✖";
+        closeBtn.style.marginLeft = "18px";
+        closeBtn.style.cursor = "pointer";
+        closeBtn.style.fontSize = "1.2em";
+        closeBtn.style.verticalAlign = "middle";
+        closeBtn.style.float = "right";
+        closeBtn.style.marginTop = "-2px";
+        closeBtn.style.marginRight = "-8px";
+        closeBtn.title = "Close";
+        closeBtn.onclick = () => toast.remove();
+
+        // Toast styling
         toast.style.position = "fixed";
         toast.style.bottom = "30px";
         toast.style.right = "30px";
@@ -81,18 +106,24 @@ function blinkScreen(duration = 1000, sound = 'bell', disableMusic = false, disp
         toast.style.fontWeight = "bold";
         toast.style.boxShadow = "0 4px 24px #0008";
         toast.style.zIndex = "999999";
+        toast.style.maxWidth = "340px";
+        toast.style.minWidth = "220px";
+        toast.style.display = "flex";
+        toast.style.alignItems = "center";
+        toast.style.justifyContent = "space-between";
+
+        toast.appendChild(closeBtn);
         document.body.appendChild(toast);
 
-        if (!disableMusic) {
-            if (sound === 'beep') playBeep();
-            else if (sound === 'chime') playChime();
-            else playBell();
+        // Always play sound
+        if (sound !== 'none') {
+            playSound(sound);
         }
 
         setTimeout(() => {
-            toast.remove();
+            if (document.body.contains(toast)) toast.remove();
         }, duration);
-    } else {
+    } else if ('fullscreen' === displayStyle) {
         // Fullscreen overlay
         const overlay = document.createElement("div");
         overlay.id = "eye-reminder-overlay";
@@ -118,22 +149,53 @@ function blinkScreen(duration = 1000, sound = 'bell', disableMusic = false, disp
         overlay.appendChild(msg);
 
         document.body.appendChild(overlay);
+        console.log('Sound type is ', sound);
 
-        if (!disableMusic) {
-            if (sound === 'beep') playBeep();
-            else if (sound === 'chime') playChime();
-            else playBell();
+        if (sound !== 'none') {
+            playSound(sound);
         }
+       
 
         setTimeout(() => {
             overlay.remove();
         }, duration);
+    } else {
+        if (sound !== 'none') {
+            playSound(sound);
+        }
     }
+}
+
+function playSound(sound) {
+     // Always play sound
+     if (sound === 'beep') playBeep();
+     else if (sound === 'chime') playChime();
+     else if (sound === 'pop') playPop();
+     else if (sound === 'softblink') playSoftBlink();
+     else if (sound.endsWith && sound.endsWith('.mp3')) playAudioFile(sound);
+     else playBell();
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "blink") {
-        blinkScreen(request.duration, request.sound, request.disableMusic, request.displayStyle);
+        // Log configuration settings
+        console.log("[Eye Reminder] Configuration:",
+          "Interval (min):", request.interval,
+          "| Popup Duration (ms):", request.duration,
+          "| Popup Style:", request.displayStyle,
+          "| Sound Effect:", request.sound
+        );
+        blinkScreen(request.duration, request.sound, request.displayStyle);
         sendResponse({ status: "blinked", duration: request.duration });
     }
 });
+
+function playAudioFile(src) {
+    try {
+        const audio = new Audio(chrome.runtime.getURL(src));
+        audio.volume = 0.7;
+        audio.play().catch(() => {});
+    } catch (e) {
+        console.error('Error playing audio file:', e);
+    }
+}

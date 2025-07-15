@@ -17,8 +17,14 @@
     },
     "content_scripts": [
       {
-        "matches": ["https://*/*", "http://*/*"],
+          "matches": ["http://*/*", "https://*/*"],
         "js": ["content.js"]
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["music/*.mp3"],
+        "matches": ["<all_urls>"]
       }
     ]
   }
